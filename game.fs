@@ -88,19 +88,23 @@ $f0 PORTB_ODR bis!
   nip
 ;
 
-: display-result ( flag -- )
+: display-result ( n flag -- )
   cr
-  if ." Right!" 1 successes +!
-  else ." Wrong!" 1 failures +!
+  if ." Right! " 1 successes +!
+  else ." Wrong! " 1 failures +!
   then
   
+  swap . ." ms"
+
   \ wait 100 ms to ensure buttons are released and stable
   #100 ms
 ;
 
 : play-one-round ( -- n )
   random-led
+  cycles64 2>r
   wait-for-button
+  cycles64 2r> d- 8000. d/ drop -rot
   -leds
   eval-result
   dup 2 < if dup display-result then
