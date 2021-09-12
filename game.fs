@@ -6,6 +6,9 @@
 #require longan-rgb.fs
 #require ms.fs
 
+0 variable successes
+0 variable failures
+
 \ configure PB4 .. PB7 as input pull up
 : buttons-init  ( -- )
 $44440000 PORTB_CRL bic!
@@ -59,6 +62,8 @@ $f0 PORTB_ODR bis!
   begin change-led-on-button 0= until
 ;
 
+\ wait for 0 ,, 4095 seconds and then show random led color
+\ 0 = red, 1 = green, 2 = blue
 : random-led ( -- n )
   cycles $fff and dup ms 
   3 mod 
@@ -84,8 +89,13 @@ $f0 PORTB_ODR bis!
 ;
 
 : display-result ( flag -- )
-  cr if ." Right!" else ." Wrong!" then
-  100 ms
+  cr
+  if ." Right!" 1 successes +!
+  else ." Wrong!" 1 failures +!
+  then
+  
+  \ wait 100 ms to ensure buttons are released and stable
+  #100 ms
 ;
 
 : play-one-round ( -- n )
@@ -96,12 +106,31 @@ $f0 PORTB_ODR bis!
   dup 2 < if dup display-result then
 ;
 
+\ calculate success rate in %, round half up
+: success-rate ( fail succ -- rate )
+  dup 200 * -rot + / 1+ 2 /
+;
+
+: show-statistics ( -- )
+  failures @ 
+  successes @ 
+  2dup
+  cr ." Your result: successes = " . ." , failures = " . ." , success rate = " success-rate . ." %"
+  0 successes !
+  0 failures !
+;
+
 : play ( -- )
   begin play-one-round 2 = until
+  show-statistics
   cr ." Game over"
 ;
 
-longan-rgb-init
-buttons-init  
+: game-init ( -- )
+  longan-rgb-init
+  buttons-init
+;
+
+game-init
 play
 
