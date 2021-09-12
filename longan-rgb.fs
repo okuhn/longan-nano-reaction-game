@@ -81,11 +81,15 @@ decimal  \ Default base
   1 2 lshift $4001080c ( PORTA_OCTL )   xor!  ;  \ PA2 blue LED
 
 
+: -leds ( -- )  \ Switch all LEDs off
+  -red -green -blue
+;
+
 : longan-rgb-init  ( -- )  \ Prepare RGB LED of Longan Nano board
 
   \ Switch off LEDs first to avoid a possible glitch
    \   when switching to output in the next step
-  -red -green -blue
+  -leds
 
   \ Make pins PA1 (green) and PA2 (blue) outputs
   $40010800 ( PORTA_CTL0 ) @
