@@ -1,3 +1,7 @@
+\ Little reaction game using a RISC-V based Longan nano board, 4 push buttons and Mecrisp Quintus Forth 
+\ written by Oliver Kuhn, licensed under GPLv3
+\ available at https://github.com/okuhn/longan-nano-reaction-game
+
 #require portdefinitions.fs
 #require longan-rgb.fs
 #require ms.fs
@@ -79,7 +83,7 @@ $f0 PORTB_ODR bis!
   nip
 ;
 
-: display-result
+: display-result ( flag -- )
   cr if ." Right!" else ." Wrong!" then
   100 ms
 ;
